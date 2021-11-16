@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ required "Common name is needed" .Values.commonName }}-webapp-service
+  namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}  
+  labels:
+    app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-webapp
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-webapp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

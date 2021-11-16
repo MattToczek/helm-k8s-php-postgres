@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ required "Common name is needed" .Values.commonName }}-ingress
+  namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ required "Common name is needed" .Values.commonName }}-webapp-service
+            port:
+              number: 80

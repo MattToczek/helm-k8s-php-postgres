@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  webapp:
+    build:
+      context: ./webapp
+    ports:
+      - "80:80"
+    networks:
+      - db-to-webapp
+    depends_on:
+      - "db"
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_PWD: password
+      USER: postgres
+  db:
+    image: postgres
+    networks:
+      - db-to-webapp
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+
+networks:
+  db-to-webapp:
+
+        

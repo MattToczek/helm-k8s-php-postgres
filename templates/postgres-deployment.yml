@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ required "Common name is needed" .Values.commonName }}-postgres-deployment
+  namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}
+  labels:
+    app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-postgres
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-postgres
+  template:
+    metadata:
+      namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}
+      labels:
+        app:  {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-postgres
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:10.4
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 5432
+        envFrom:
+          - secretRef:
+              name: db-credentials

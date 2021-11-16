@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ required "Common name is needed" .Values.commonName }}-webapp-deployment
+  namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}
+  labels:
+    app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-webapp
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-webapp
+  template:
+    metadata:
+      namespace: {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}
+      labels:
+        app:  {{ printf "%s-%s" .Values.commonName .Values.envSuffix }}-webapp
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+    spec:
+      containers:
+      - name: webapp
+        image: gcr.io/{{ .Values.projectName }}/php/todo:latest
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        env:
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_USER
+        - name: DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_PASSWORD
+        - name: DB_HOST
+          value: "{{ .Values.commonName }}-postgres-service"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_USER

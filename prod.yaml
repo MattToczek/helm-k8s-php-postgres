@@ -1,0 +1,5 @@
+common-name: helm-php
+envSuffix: prod
+replicas: 3
+db_user: postgres
+db_pwd: password
